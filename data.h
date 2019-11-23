@@ -4,6 +4,7 @@
 
 #ifndef ACHIEVE_PASS_DATA_H
 #define ACHIEVE_PASS_DATA_H
+
 #include <stdio.h>
 #include <string.h>
 
@@ -24,9 +25,15 @@ struct FileEntry {
     short numberOfExams;
     struct ExamEntry exams[];
 };
+
 void createNewProfile();
-void create(FILE* fp,struct FileEntry* FileEntry);
+
+void create(FILE *fp, struct FileEntry *FileEntry);
+
 struct FileEntry retrieveEntry(int id);
+
 void update(struct FileEntry);
+
 struct FileEntry delete(int id);
+
 #endif //ACHIEVE_PASS_DATA_H

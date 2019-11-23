@@ -3,4 +3,4 @@ project(achieve_pass C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(achieve_pass main.c data.c data.h)
+add_executable(achieve_pass main.c data.c data.h econio.c econio.h)

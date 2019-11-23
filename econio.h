@@ -22,7 +22,7 @@ typedef enum EconioColor {
     COL_LIGHTCYAN = 11,
     COL_LIGHTRED = 12,
     COL_LIGHTMAGENTA = 13,
-    COL_YELLOW = 14,    COL_LIGHTYELLOW = COL_YELLOW,
+    COL_YELLOW = 14, COL_LIGHTYELLOW = COL_YELLOW,
     COL_WHITE = 15,
     COL_RESET = 16,
 } EconioColor;
@@ -30,7 +30,7 @@ typedef enum EconioColor {
 
 typedef enum EconioKey {
     // function keys are not supported on Windows
-    KEY_F1 = -1,
+            KEY_F1 = -1,
     KEY_F2 = -2,
     KEY_F3 = -3,
     KEY_F4 = -4,

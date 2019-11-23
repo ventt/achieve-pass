@@ -166,7 +166,7 @@ void econio_sleep(double sec) {
 
 
 void econio_textcolor(int color) {
-    static int colormap[] = { 30, 34, 32, 36, 31, 35, 33, 37, 90, 94, 92, 96, 91, 95, 93, 97, 39 };
+    static int colormap[] = {30, 34, 32, 36, 31, 35, 33, 37, 90, 94, 92, 96, 91, 95, 93, 97, 39};
 
     assert(color >= 0 && color <= 16);
     printf("\033[%dm", colormap[color]);
@@ -174,7 +174,7 @@ void econio_textcolor(int color) {
 
 
 void econio_textbackground(int color) {
-    static int colormap[] = { 40, 44, 42, 46, 41, 45, 43, 47, 100, 104, 102, 106, 101, 105, 103, 107, 49 };
+    static int colormap[] = {40, 44, 42, 46, 41, 45, 43, 47, 100, 104, 102, 106, 101, 105, 103, 107, 49};
 
     assert(color >= 0 && color <= 16);
     printf("\033[%dm", colormap[color]);
@@ -182,7 +182,7 @@ void econio_textbackground(int color) {
 
 
 void econio_gotoxy(int x, int y) {
-    printf("\033[%d;%dH", y+1, x+1);
+    printf("\033[%d;%dH", y + 1, x + 1);
 }
 
 
@@ -259,62 +259,64 @@ int econio_getch() {
         char const *escape;
         EconioKey key;
     } unixkeycodes[] = {
-        {"\033OP", KEY_F1},
-        {"\033OQ", KEY_F2},
-        {"\033OR", KEY_F3},
-        {"\033OS", KEY_F4},
-        {"\033[15~", KEY_F5},
-        {"\033[17~", KEY_F6},
-        {"\033[18~", KEY_F7},
-        {"\033[19~", KEY_F8},
-        {"\033[20~", KEY_F9},
-        {"\033[21~", KEY_F10},
-        {"\033[23~", KEY_F11},
-        {"\033[24~", KEY_F12},
-        {"\033[A", KEY_UP},
-        {"\033[B", KEY_DOWN},
-        {"\033[D", KEY_LEFT},
-        {"\033[C", KEY_RIGHT},
-        {"\033[5~", KEY_PAGEUP},
-        {"\033[6~", KEY_PAGEDOWN},
-        {"\033[H", KEY_HOME},
-        {"\033[F", KEY_END},
-        {"\033[2~", KEY_INSERT},
-        {"\033[3~", KEY_DELETE},
-        {"\033[1;5A", KEY_CTRLUP},
-        {"\033[1;5B", KEY_CTRLDOWN},
-        {"\033[1;5D", KEY_CTRLLEFT},
-        {"\033[1;5C", KEY_CTRLRIGHT},
-        {"\033[5;5~", KEY_CTRLPAGEUP},
-        {"\033[6;5~", KEY_CTRLPAGEDOWN},
-        {"\033[1;5H", KEY_CTRLHOME},
-        {"\033[1;5F", KEY_CTRLEND},
-        {"\033[3;5~", KEY_CTRLDELETE},
-        {NULL, KEY_UNKNOWNKEY},
+            {"\033OP",    KEY_F1},
+            {"\033OQ",    KEY_F2},
+            {"\033OR",    KEY_F3},
+            {"\033OS",    KEY_F4},
+            {"\033[15~",  KEY_F5},
+            {"\033[17~",  KEY_F6},
+            {"\033[18~",  KEY_F7},
+            {"\033[19~",  KEY_F8},
+            {"\033[20~",  KEY_F9},
+            {"\033[21~",  KEY_F10},
+            {"\033[23~",  KEY_F11},
+            {"\033[24~",  KEY_F12},
+            {"\033[A",    KEY_UP},
+            {"\033[B",    KEY_DOWN},
+            {"\033[D",    KEY_LEFT},
+            {"\033[C",    KEY_RIGHT},
+            {"\033[5~",   KEY_PAGEUP},
+            {"\033[6~",   KEY_PAGEDOWN},
+            {"\033[H",    KEY_HOME},
+            {"\033[F",    KEY_END},
+            {"\033[2~",   KEY_INSERT},
+            {"\033[3~",   KEY_DELETE},
+            {"\033[1;5A", KEY_CTRLUP},
+            {"\033[1;5B", KEY_CTRLDOWN},
+            {"\033[1;5D", KEY_CTRLLEFT},
+            {"\033[1;5C", KEY_CTRLRIGHT},
+            {"\033[5;5~", KEY_CTRLPAGEUP},
+            {"\033[6;5~", KEY_CTRLPAGEDOWN},
+            {"\033[1;5H", KEY_CTRLHOME},
+            {"\033[1;5F", KEY_CTRLEND},
+            {"\033[3;5~", KEY_CTRLDELETE},
+            {NULL,        KEY_UNKNOWNKEY},
     };
 
     assert(inrawmode());
     econio_flush();
 
-    enum { bufsize = 10 };
+    enum {
+        bufsize = 10
+    };
     char s[bufsize];
     int i = 0;
     s[i++] = rawgetch();
-    if (s[i-1] == 0x7F)
+    if (s[i - 1] == 0x7F)
         return KEY_BACKSPACE;
-    if (s[i-1] != 0x1B || !econio_kbhit())     // only an escape sequence if other chars can be read
-        return s[i-1];
+    if (s[i - 1] != 0x1B || !econio_kbhit())     // only an escape sequence if other chars can be read
+        return s[i - 1];
 
     // read following chars and concatenate to see the escape sequence
     s[i++] = rawgetch();
-    if (s[i-1] == 'O') {    // VT100 f1-f4: OP-OS
+    if (s[i - 1] == 'O') {    // VT100 f1-f4: OP-OS
         s[i++] = rawgetch();
-    } else if (s[i-1] == '[') { // other: always delimited by uppercase char or tilde
+    } else if (s[i - 1] == '[') { // other: always delimited by uppercase char or tilde
         s[i++] = rawgetch();
-        while (!(isupper(s[i-1]) || s[i-1] == '~') && (i < bufsize-1))
+        while (!(isupper(s[i - 1]) || s[i - 1] == '~') && (i < bufsize - 1))
             s[i++] = rawgetch();
     } else {    // unknown sequence, return verbatim
-        ungetc(s[i-1], stdin);
+        ungetc(s[i - 1], stdin);
         return s[0];
     }
     s[i] = '\0';
