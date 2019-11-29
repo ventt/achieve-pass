@@ -17,23 +17,32 @@ struct ExamEntry {
     int hoursDone;
 };
 
-struct FileEntry {
+struct SubjectEntry {
     int id;
-    char *subject;
+    char *name;
     char *description;
-    short credits;
-    short numberOfExams;
-    struct ExamEntry exams[];
+    int credits;
+    int exams_size;
+    struct ExamEntry *exams;
 };
 
-void createNewProfile();
+struct FileEntry {
+    char *user;
+    int achievement_points;
+    int subjects_size;
+    struct SubjectList_node *subjects_list;
+};
+struct SubjectList_node {
+    struct SubjectEntry *data;
+    struct SubjectList_node *nextNode;
+};
 
-void create(FILE *fp, struct FileEntry *FileEntry);
+char *readLine(FILE *fp);
 
-struct FileEntry retrieveEntry(int id);
+void save(struct FileEntry *fileEntry);
 
-void update(struct FileEntry);
+struct FileEntry *read();
 
-struct FileEntry delete(int id);
+void free_entry(struct FileEntry *fileEntry);
 
 #endif //ACHIEVE_PASS_DATA_H
