@@ -7,30 +7,25 @@
 #include <stdlib.h>
 
 char *readLine(FILE *fp) {
-    int buf_size = 32;
-    int index = 0;
-    char *line = (char *) malloc(sizeof(char) * buf_size);
-    if (line == NULL) {
-        perror("String beolvasas memoriajat nem tudtam lefoglalni!RIP");
-        return NULL;
-    }
-    int ch = 1;
+    char buf[1024];
+    int i = 0;
+    int newLine = 0;
 
-    while (ch) {
-        ch = fgetc(fp);
+    while (!newLine) {
+        int c;
+        c = fgetc(fp);
 
-        if (ch == '\n')
-            ch = 0;
-
-        if (buf_size <= index) {
-            buf_size += 32;
-            line = realloc(line, buf_size);
+        if (c == '\n') {
+            newLine = 1;
+        } else {
+            buf[i++] = (char) c;
         }
-        line[index++] = ch;
-
     }
-    line[index] = '\0';
-    return line;
+    buf[i++] = '\0';
+
+    char *result = calloc(i + 1, sizeof(char));
+    strlcpy(result, buf, i + 1);
+    return result;
 }
 
 int readLineInt(FILE *fp) {
@@ -54,9 +49,10 @@ void save(struct FileEntry *fe) {
     fprintf(fp, "%s\n", fe->user);
     fprintf(fp, "%d\n", fe->achievement_points);
     fprintf(fp, "%d\n", fe->subjects_size);
-
+    fflush(fp);
+    if (fe->subjects_list != NULL) {
     for (struct SubjectList_node *list_iterator = fe->subjects_list;
-         list_iterator->nextNode != NULL; list_iterator = list_iterator->nextNode) {
+         list_iterator != NULL; list_iterator = list_iterator->nextNode) {
         fprintf(fp, "%d\n", list_iterator->data->id);
         fprintf(fp, "%s\n", list_iterator->data->name);
         fprintf(fp, "%s\n", list_iterator->data->description);
@@ -72,6 +68,7 @@ void save(struct FileEntry *fe) {
         }
     }
     fflush(fp);
+    }
     fclose(fp);
 }
 
@@ -86,7 +83,6 @@ struct FileEntry *read() {
     fileEntry->subjects_size = readLineInt(fp);
     fileEntry->subjects_list = malloc(sizeof(struct SubjectList_node));
     fileEntry->subjects_list->data = NULL;
-    //fileEntry->subjects_list->nextNode = NULL;
 
     for (int subject_idx = 0; subject_idx < fileEntry->subjects_size; subject_idx++) {
 
@@ -125,6 +121,8 @@ struct FileEntry *read() {
 }
 
 void free_entry(struct FileEntry *fileEntry) {
+    free(fileEntry->user); //12. sor 3.
+
     struct SubjectList_node *next = fileEntry->subjects_list;
     while (next != NULL) {
         struct SubjectList_node *current = next;
@@ -135,6 +133,6 @@ void free_entry(struct FileEntry *fileEntry) {
         free(current->data->exams); //99. sor
         free(current); //111. sor
     }
-    free(fileEntry->user); //12. sor 3.
+
     free(fileEntry);
 }

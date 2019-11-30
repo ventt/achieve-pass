@@ -44,7 +44,7 @@ void progress_bar(int percentage) {
     econio_textcolor(COL_RESET);
 }
 
-void main_screen(struct main_screen_model model) {
+void main_screen_window(struct main_screen_model model) {
     econio_set_title("Achieve Pass - Exams");
     struct status_model;
     econio_textcolor(COL_LIGHTBLUE);
@@ -60,9 +60,10 @@ void main_screen(struct main_screen_model model) {
         double percent = ((double) exam->elapsedHours / (double) allHour) * 100;
         printf(" %.0f%%\t%d/%d hours\n", percent, exam->elapsedHours, allHour);
         progress_bar((int) percent);
-        printf("Commands: /addtime <CourseId> <ExamId> /addcourse\n"
-               "/checkcourse <CourseId> /showdone\n");
+
     }
+    printf("Commands: /addtime <CourseId> <ExamId> /addcourse\n"
+           "/checkcourse <CourseId> /showdone\n");
 }
 
 void reg_window() {
@@ -77,5 +78,54 @@ void reg_window() {
     }
 
     econio_textcolor(COL_RESET);
+}
+
+void add_subject_window() {
+    header();
+    printf("\n\n Add new course\n");
+
+}
+
+void add_subject_window_details(int edit_choice_to_show) {
+    switch (edit_choice_to_show) {
+        case 1:
+            printf("(1) Course Name = ");
+            break;
+        case 2:
+            printf("(2) Worth of credits = ");
+            break;
+        case 3:
+            printf("(3) Describe = ");
+            break;
+        case 4:
+            printf("(4) Number of Exams = ");
+            break;
+        default:
+            break;
+    }
+}
+
+void add_subject_exam_date(int exam_idx) {
+    printf("\t%d.Exam > Date of exam(YYYY.MM.DD) = ", exam_idx);
+}
+
+void add_subject_exam_hours_done(int exam_idx) {
+    printf("\t%d.Exam > Hours done = ", exam_idx);
+}
+
+void saved_window() {
+    econio_textcolor(COL_GREEN);
+    econio_clrscr();
+    printf("     _______.     ___      ____    ____  _______  _______  \n"
+           "    /       |    /   \\     \\   \\  /   / |   ____||       \\ \n"
+           "   |   (----`   /  ^  \\     \\   \\/   /  |  |__   |  .--.  |\n"
+           "    \\   \\      /  /_\\  \\     \\      /   |   __|  |  |  |  |\n"
+           ".----)   |    /  _____  \\     \\    /    |  |____ |  '--'  |\n"
+           "|_______/    /__/     \\__\\     \\__/     |_______||_______/ \n"
+           "                                                           ");
+    econio_flush();
+    econio_sleep(1);
+    econio_textcolor(COL_RESET);
+    econio_clrscr();
 }
 

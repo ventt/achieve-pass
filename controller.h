@@ -11,6 +11,10 @@
 
 char *get_line_from_input();
 
-void create_new_save();
+struct FileEntry create_new_save();
+
+void add_subject(struct FileEntry *fileEntry, int id);
+
+void main_screen(struct FileEntry *fileEntry);
 
 #endif //ACHIEVE_PASS_CONTROLLER_H
