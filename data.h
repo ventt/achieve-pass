@@ -37,12 +37,14 @@ struct SubjectList_node {
     struct SubjectList_node *nextNode;
 };
 
-char *readLine(FILE *fp);
-
 void save(struct FileEntry *fileEntry);
 
 struct FileEntry *read();
 
 void free_entry(struct FileEntry *fileEntry);
+
+int is_file_exists();
+
+struct SubjectList_node *delete_subject(struct SubjectList_node *, int);
 
 #endif //ACHIEVE_PASS_DATA_H

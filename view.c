@@ -46,24 +46,33 @@ void progress_bar(int percentage) {
 
 void main_screen_window(struct main_screen_model model) {
     econio_set_title("Achieve Pass - Exams");
-    struct status_model;
     econio_textcolor(COL_LIGHTBLUE);
     printf("Your Courses:\n\n");
+    if (model.exams_size != 0) {
+        for (int i = 0; i < model.exams_size; i++) {
+            struct main_screen_model_exam *exam = model.exams + i;
 
-    for (int i = 0; i < model.exams_size; i++) {
-        struct main_screen_model_exam *exam = model.exams + i;
+            econio_textcolor(COL_WHITE);
+            printf("(%d) %s\n", i, exam->course_name);
+            printf(" %d.exam\t %d hours left\n", exam->examNumber, 666);
+            int allHour = exam->credit * 5;
+            double percent = ((double) exam->elapsedHours / (double) allHour) * 100;
+            printf(" %.0f%%\t%d/%d hours\n", percent, exam->elapsedHours, allHour);
+            progress_bar((int) percent);
 
-        econio_textcolor(COL_WHITE);
-        printf("(%d) %s\n", i, exam->course_name);
-        printf(" %d.exam\t %d hours left\n", exam->examNumber, 666);
-        int allHour = exam->credit * 5;
-        double percent = ((double) exam->elapsedHours / (double) allHour) * 100;
-        printf(" %.0f%%\t%d/%d hours\n", percent, exam->elapsedHours, allHour);
-        progress_bar((int) percent);
-
+        }
+    } else {
+        econio_textcolor(COL_CYAN);
+        printf(" _  _ __     ___ _  _  __  __  __ ___    ____ __     ___ _  _ __ _    _ \n"
+               "( \\( )  \\   (  _| \\/ )(  )(  \\/  ) __)  (_  _)  \\   / __| )( )  ( \\/\\/ )\n"
+               " )  ( () )   ) _))  ( /__\\ )    (\\__ \\    )(( () )  \\__ \\)__( () )    / \n"
+               "(_)\\_)__/   (___|_/\\_|_)(_|_/\\/\\_|___/   (__)\\__/   (___(_)(_)__/ \\/\\/  ");
+        econio_textcolor(COL_RESET);
     }
-    printf("Commands: /addtime <CourseId> <ExamId> /addcourse\n"
+
+    printf("\nCommands: /addtime <CourseId> <ExamId> /addcourse\n"
            "/checkcourse <CourseId> /showdone\n");
+    econio_flush();
 }
 
 void reg_window() {

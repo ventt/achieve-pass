@@ -3,6 +3,7 @@
 //
 #include "controller.h"
 #include "econio.h"
+#include "data.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -46,16 +47,16 @@ int string_to_date_array(char *string, int which) {
 }
 
 
-struct FileEntry create_new_save() {
+struct FileEntry *create_new_save() {
     econio_clrscr();
     reg_window();
     char *name = get_line_from_input();
-    struct FileEntry nf;
-    nf.user = name;
-    nf.achievement_points = 0;
-    nf.subjects_size = 0;
-    nf.subjects_list = NULL;
-    save(&nf);
+    struct FileEntry *nf = malloc(sizeof(struct FileEntry));
+    nf->user = name;
+    nf->achievement_points = 0;
+    nf->subjects_size = 0;
+    nf->subjects_list = NULL;
+    save(nf);
     free(name);
     return nf;
 }
@@ -64,8 +65,13 @@ void add_subject(struct FileEntry *fileEntry, int id) {
     add_subject_window();
     struct SubjectEntry *subject = malloc(sizeof(struct SubjectEntry));
     struct SubjectList_node *new_node = malloc(sizeof(struct SubjectList_node));
-    subject->id = id;
-
+    {
+        subject->id = id;
+        subject->name = NULL;
+        subject->description = NULL;
+        subject->exams_size = 0;
+        subject->exams = NULL;
+    }
 
     add_subject_window_details(1);
     subject->name = get_line_from_input();
@@ -124,27 +130,33 @@ void main_screen(struct FileEntry *fileEntry) {
     header();
     struct status_model statusModel;
     statusModel.achievement_points = fileEntry->achievement_points;
-    status_bar();
+
+    //kell meg a keszek
+
+    status_bar(statusModel);
     struct main_screen_model new_msm;
     new_msm.exams_size = 0;
-    for (struct SubjectList_node *iterator = fileEntry->subjects_list;
-         iterator != NULL; iterator = iterator->nextNode) {
-        new_msm.exams_size += iterator->data->exams_size;
-    }
-    new_msm.exams = malloc(new_msm.exams_size * sizeof(struct main_screen_model_exam));
-    int idx = 0;
-    for (struct SubjectList_node *iterator = fileEntry->subjects_list;
-         iterator != NULL; iterator = iterator->nextNode) {
-        int i;
-        for (i = 0; i < iterator->data->exams_size; ++i) {
-            new_msm.exams[i + idx].course_name = iterator->data->name;
-            new_msm.exams[i + idx].courseNumber = iterator->data->id;
-            new_msm.exams[i + idx].examNumber = i + 1;
-            new_msm.exams[i + idx].credit = iterator->data->credits;
-            new_msm.exams[i + idx].elapsedHours = iterator->data->exams[i].hoursDone;
+    if (fileEntry->subjects_size != 0) {
+        for (struct SubjectList_node *iterator = fileEntry->subjects_list;
+             iterator != NULL; iterator = iterator->nextNode) {
+            new_msm.exams_size += iterator->data->exams_size;
         }
-        idx += idx + i + 1;
+        new_msm.exams = malloc(new_msm.exams_size * sizeof(struct main_screen_model_exam));
+        int idx = 0;
+        for (struct SubjectList_node *iterator = fileEntry->subjects_list;
+             iterator != NULL; iterator = iterator->nextNode) {
+            int i;
+            for (i = 0; i < iterator->data->exams_size; ++i) {
+                new_msm.exams[i + idx].course_name = iterator->data->name;
+                new_msm.exams[i + idx].courseNumber = iterator->data->id;
+                new_msm.exams[i + idx].examNumber = i + 1;
+                new_msm.exams[i + idx].credit = iterator->data->credits;
+                new_msm.exams[i + idx].elapsedHours = iterator->data->exams[i].hoursDone;
+            }
+            idx += idx + i + 1;
+        }
     }
     main_screen_window(new_msm);
 }
+
 

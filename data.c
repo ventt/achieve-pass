@@ -51,25 +51,38 @@ void save(struct FileEntry *fe) {
     fprintf(fp, "%d\n", fe->subjects_size);
     fflush(fp);
     if (fe->subjects_list != NULL) {
-    for (struct SubjectList_node *list_iterator = fe->subjects_list;
-         list_iterator != NULL; list_iterator = list_iterator->nextNode) {
-        fprintf(fp, "%d\n", list_iterator->data->id);
-        fprintf(fp, "%s\n", list_iterator->data->name);
-        fprintf(fp, "%s\n", list_iterator->data->description);
-        fprintf(fp, "%d\n", list_iterator->data->credits);
-        fprintf(fp, "%d\n", list_iterator->data->exams_size);
+        for (struct SubjectList_node *list_iterator = fe->subjects_list;
+             list_iterator != NULL; list_iterator = list_iterator->nextNode) {
+            fprintf(fp, "%d\n", list_iterator->data->id);
+            fprintf(fp, "%s\n", list_iterator->data->name);
+            fprintf(fp, "%s\n", list_iterator->data->description);
+            fprintf(fp, "%d\n", list_iterator->data->credits);
+            fprintf(fp, "%d\n", list_iterator->data->exams_size);
 
-        for (int exam_idx = 0; exam_idx < list_iterator->data->exams_size; exam_idx++) {
-            struct ExamEntry exam = list_iterator->data->exams[exam_idx];
-            fprintf(fp, "%d\n", exam.date.year);
-            fprintf(fp, "%d\n", exam.date.month);
-            fprintf(fp, "%d\n", exam.date.day);
-            fprintf(fp, "%d\n", exam.hoursDone);
+            for (int exam_idx = 0; exam_idx < list_iterator->data->exams_size; exam_idx++) {
+                struct ExamEntry exam = list_iterator->data->exams[exam_idx];
+                fprintf(fp, "%d\n", exam.date.year);
+                fprintf(fp, "%d\n", exam.date.month);
+                fprintf(fp, "%d\n", exam.date.day);
+                fprintf(fp, "%d\n", exam.hoursDone);
+            }
         }
-    }
-    fflush(fp);
+        fflush(fp);
     }
     fclose(fp);
+}
+
+int is_file_exists() {
+    int result;
+    FILE *fp = fopen("save.txt", "r");
+
+    if (fp)
+        result = 1;
+    else
+        result = 0;
+
+    fclose(fp);
+    return result;
 }
 
 struct FileEntry *read() {
@@ -120,18 +133,53 @@ struct FileEntry *read() {
     return fileEntry;
 }
 
+void free_subject_node(struct SubjectList_node *node) {
+    free(node->data->name); //12. sor 1.
+    free(node->data->description); //12. sor 2.
+    free(node->data->exams); //99. sor
+    free(node); //111. sor
+}
+
+struct SubjectList_node *delete_subject(struct SubjectList_node *list, int id) {
+    struct SubjectList_node *tmp;
+    if (list->data->id == id) {
+        tmp = list;
+        list = list->nextNode;
+        free_subject_node(tmp);
+        return list;
+    }
+
+    struct SubjectList_node *iterator;
+
+    for (iterator = list; iterator != NULL; iterator = iterator->nextNode) {
+        if (iterator->nextNode->data->id == id) {
+            tmp = iterator->nextNode;
+            iterator->nextNode = tmp->nextNode;
+            free_subject_node(tmp);
+            return list;
+        }
+        if (iterator->nextNode->nextNode == NULL && iterator->nextNode->data->id == id) {
+            tmp = iterator->nextNode;
+            iterator->nextNode = NULL;
+            free_subject_node(tmp);
+            return list;
+        }
+    }
+    return list;
+}
+
+
 void free_entry(struct FileEntry *fileEntry) {
     free(fileEntry->user); //12. sor 3.
 
-    struct SubjectList_node *next = fileEntry->subjects_list;
-    while (next != NULL) {
-        struct SubjectList_node *current = next;
-        next = next->nextNode;
-
-        free(current->data->name); //12. sor 1.
-        free(current->data->description); //12. sor 2.
-        free(current->data->exams); //99. sor
-        free(current); //111. sor
+    if (fileEntry->subjects_size) {
+        struct SubjectList_node *tmp;
+        struct SubjectList_node *it;
+        for (it = fileEntry->subjects_list; it != NULL;) {
+            tmp = it;
+            it = it->nextNode;
+            free_subject_node(tmp);
+        }
     }
 
     free(fileEntry);
