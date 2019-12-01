@@ -168,6 +168,15 @@ struct SubjectList_node *delete_subject(struct SubjectList_node *list, int id) {
     return list;
 }
 
+void add_exam(struct SubjectEntry *subjectEntry, struct Date date, int hoursDone) {
+    subjectEntry->exams = realloc(subjectEntry->exams, ++subjectEntry->exams_size * sizeof(struct ExamEntry));
+
+    struct ExamEntry exam;
+    exam.date = date;
+    exam.hoursDone = hoursDone;
+
+    subjectEntry->exams[subjectEntry->exams_size - 1] = exam;
+}
 
 void free_entry(struct FileEntry *fileEntry) {
     free(fileEntry->user); //12. sor 3.
@@ -184,3 +193,5 @@ void free_entry(struct FileEntry *fileEntry) {
 
     free(fileEntry);
 }
+
+

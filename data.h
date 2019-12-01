@@ -47,4 +47,6 @@ int is_file_exists();
 
 struct SubjectList_node *delete_subject(struct SubjectList_node *, int);
 
+void add_exam(struct SubjectEntry *subjectEntry, struct Date date, int hoursDone);
+
 #endif //ACHIEVE_PASS_DATA_H
