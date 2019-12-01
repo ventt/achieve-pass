@@ -20,7 +20,7 @@ void reg_window();
 
 void add_subject_window();
 
-void add_subject_window_details(int edit_choice_to_show);
+void subject_window_details(int edit_choice_to_show);
 
 void add_subject_exam_date(int exam_idx);
 

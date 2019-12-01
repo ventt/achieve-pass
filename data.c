@@ -94,40 +94,42 @@ struct FileEntry *read() {
     fileEntry->user = readLine(fp);
     fileEntry->achievement_points = readLineInt(fp);
     fileEntry->subjects_size = readLineInt(fp);
-    fileEntry->subjects_list = malloc(sizeof(struct SubjectList_node));
-    fileEntry->subjects_list->data = NULL;
 
-    for (int subject_idx = 0; subject_idx < fileEntry->subjects_size; subject_idx++) {
+    if (fileEntry->subjects_size) {
+        fileEntry->subjects_list = malloc(sizeof(struct SubjectList_node));
+        fileEntry->subjects_list->data = NULL;
+        for (int subject_idx = 0; subject_idx < fileEntry->subjects_size; subject_idx++) {
 
-        struct SubjectEntry *new_subject = malloc(sizeof(struct SubjectEntry));
+            struct SubjectEntry *new_subject = malloc(sizeof(struct SubjectEntry));
 
-        new_subject->id = readLineInt(fp);
-        new_subject->name = readLine(fp);
-        new_subject->description = readLine(fp);
-        new_subject->credits = readLineInt(fp);
-        new_subject->exams_size = readLineInt(fp);
-        new_subject->exams = calloc(new_subject->exams_size, sizeof(struct SubjectEntry));
+            new_subject->id = readLineInt(fp);
+            new_subject->name = readLine(fp);
+            new_subject->description = readLine(fp);
+            new_subject->credits = readLineInt(fp);
+            new_subject->exams_size = readLineInt(fp);
+            new_subject->exams = calloc(new_subject->exams_size, sizeof(struct SubjectEntry));
 
-        for (int exam_idx = 0; exam_idx < new_subject->exams_size; exam_idx++) {
-            struct ExamEntry exam;
-            exam.date = readDate(fp);
-            exam.hoursDone = readLineInt(fp);
-            new_subject->exams[exam_idx] = exam;
-        }
-        if (fileEntry->subjects_list->data == NULL) {
-            fileEntry->subjects_list->data = new_subject;
-            fileEntry->subjects_list->nextNode = NULL;
-        } else {
-            struct SubjectList_node *new_node = malloc(sizeof(struct SubjectList_node));
-            new_node->data = new_subject;
-            struct SubjectList_node *list_iterator = fileEntry->subjects_list;
-            while (list_iterator->nextNode != NULL) {
-                list_iterator = list_iterator->nextNode;
+            for (int exam_idx = 0; exam_idx < new_subject->exams_size; exam_idx++) {
+                struct ExamEntry exam;
+                exam.date = readDate(fp);
+                exam.hoursDone = readLineInt(fp);
+                new_subject->exams[exam_idx] = exam;
             }
-            list_iterator->nextNode = new_node;
-            new_node->nextNode = NULL;
-        }
+            if (fileEntry->subjects_list->data == NULL) {
+                fileEntry->subjects_list->data = new_subject;
+                fileEntry->subjects_list->nextNode = NULL;
+            } else {
+                struct SubjectList_node *new_node = malloc(sizeof(struct SubjectList_node));
+                new_node->data = new_subject;
+                struct SubjectList_node *list_iterator = fileEntry->subjects_list;
+                while (list_iterator->nextNode != NULL) {
+                    list_iterator = list_iterator->nextNode;
+                }
+                list_iterator->nextNode = new_node;
+                new_node->nextNode = NULL;
+            }
 
+        }
     }
     fclose(fp);
     return fileEntry;

@@ -61,8 +61,18 @@ struct FileEntry *create_new_save() {
     return nf;
 }
 
-void add_subject(struct FileEntry *fileEntry, int id) {
+void add_subject(struct FileEntry *fileEntry) {
     add_subject_window();
+    //ID kiosztas
+    int max = 0;
+    for (struct SubjectList_node *iterator = fileEntry->subjects_list;
+         iterator != NULL; iterator = iterator->nextNode) {
+        if (iterator->data->id > max) {
+            max = iterator->data->id;
+        }
+    }
+    int id = max + 1;
+
     struct SubjectEntry *subject = malloc(sizeof(struct SubjectEntry));
     struct SubjectList_node *new_node = malloc(sizeof(struct SubjectList_node));
     {
@@ -73,21 +83,21 @@ void add_subject(struct FileEntry *fileEntry, int id) {
         subject->exams = NULL;
     }
 
-    add_subject_window_details(1);
+    subject_window_details(1);
     subject->name = get_line_from_input();
 
 
-    add_subject_window_details(2);
+    subject_window_details(2);
     char *creditStr = get_line_from_input();
     subject->credits = atoi(creditStr);
     free(creditStr);
 
 
-    add_subject_window_details(3);
+    subject_window_details(3);
     subject->description = get_line_from_input();
 
 
-    add_subject_window_details(4);
+    subject_window_details(4);
     char *numberOEStr = get_line_from_input();
     subject->exams_size = atoi(numberOEStr);
     free(numberOEStr);
@@ -130,11 +140,24 @@ int is_exam_done(struct ExamEntry *examEntry, struct SubjectEntry *entry) {
     return examEntry->hoursDone >= entry->credits * 5;
 }
 
+int absolved_practicing(struct FileEntry *fe) {
+    int result = 0;
+    for (struct SubjectList_node *subject_it = fe->subjects_list;
+         subject_it != NULL; subject_it = subject_it->nextNode) {
+        for (int i = 0; i < subject_it->data->exams_size; i++) {
+            // xnor
+            if (is_exam_done(&subject_it->data->exams[i], subject_it->data)) {
+                result++;
+            }
+        }
+    }
+    return result;
+}
 void main_screen(struct FileEntry *fileEntry, int showOnlyDone) {
     header();
     struct status_model statusModel;
     statusModel.achievement_points = fileEntry->achievement_points;
-
+    statusModel.absolved = absolved_practicing(fileEntry);
     //kell meg a keszek
 
     status_bar(statusModel);
@@ -160,7 +183,7 @@ void main_screen(struct FileEntry *fileEntry, int showOnlyDone) {
             for (int i = 0; i < subject_it->data->exams_size; i++) {
                 if (showOnlyDone == is_exam_done(&subject_it->data->exams[i], subject_it->data)) {
                     new_msm.exams[idx].course_name = subject_it->data->name;
-                    new_msm.exams[idx].courseNumber = subject_it->data->id;
+                    new_msm.exams[idx].course_id = subject_it->data->id;
                     new_msm.exams[idx].examNumber = i + 1;
                     new_msm.exams[idx].credit = subject_it->data->credits;
                     new_msm.exams[idx].elapsedHours = subject_it->data->exams[i].hoursDone;
@@ -170,6 +193,46 @@ void main_screen(struct FileEntry *fileEntry, int showOnlyDone) {
         }
     }
     main_screen_window(new_msm);
+}
+
+struct SubjectList_node *check_subject_window(struct SubjectList_node *list, int id) {
+    //kikeresi a targyat
+    header();
+    int found = 0;
+    struct SubjectList_node *subject;
+    for (struct SubjectList_node *subject_it = list; subject_it != NULL; subject_it = subject_it->nextNode) {
+        if (subject_it->data->id == id) {
+            subject = subject_it;
+            found = 1;
+        }
+    }
+    if (found) {
+        printf("\n");
+        subject_window_details(1);
+        printf("%s\n", subject->data->name);
+        subject_window_details(2);
+        printf("%d\n", subject->data->credits);
+        subject_window_details(3);
+        printf("%s\n", subject->data->description);
+        subject_window_details(4);
+        printf("%d", subject->data->exams_size);
+        for (int i = 0; i < subject->data->exams_size; ++i) {
+            printf("\n");
+            add_subject_exam_date(i + 1);
+            printf("%d.%d.%d", subject->data->exams[i].date.year, subject->data->exams[i].date.month,
+                   subject->data->exams[i].date.day);
+            printf("\n");
+            add_subject_exam_hours_done(i + 1);
+            printf("%d", subject->data->exams[i].hoursDone);
+        }
+        printf("\n");
+    } else {
+        printf("\nThere is no such Subject with this index!\n");
+        return NULL;
+    }
+
+    econio_flush();
+    return subject;
 }
 
 

@@ -53,7 +53,7 @@ void main_screen_window(struct main_screen_model model) {
             struct main_screen_model_exam *exam = model.exams + i;
 
             econio_textcolor(COL_WHITE);
-            printf("(%d) %s\n", i, exam->course_name);
+            printf("(%d) %s\n", exam->course_id, exam->course_name);
             printf(" %d.exam\t %d hours left\n", exam->examNumber, 666);
             int allHour = exam->credit * 5;
             double percent = ((double) exam->elapsedHours / (double) allHour) * 100;
@@ -68,10 +68,9 @@ void main_screen_window(struct main_screen_model model) {
                " )  ( () )   ) _))  ( /__\\ )    (\\__ \\    )(( () )  \\__ \\)__( () )    / \n"
                "(_)\\_)__/   (___|_/\\_|_)(_|_/\\/\\_|___/   (__)\\__/   (___(_)(_)__/ \\/\\/  ");
         econio_textcolor(COL_RESET);
+        printf("\n");
     }
 
-    printf("\nCommands: /addtime <CourseId> <ExamId> /addcourse\n"
-           "/checkcourse <CourseId> /showdone\n");
     econio_flush();
 }
 
@@ -95,7 +94,7 @@ void add_subject_window() {
 
 }
 
-void add_subject_window_details(int edit_choice_to_show) {
+void subject_window_details(int edit_choice_to_show) {
     switch (edit_choice_to_show) {
         case 1:
             printf("(1) Course Name = ");
@@ -132,6 +131,7 @@ void saved_window() {
            ".----)   |    /  _____  \\     \\    /    |  |____ |  '--'  |\n"
            "|_______/    /__/     \\__\\     \\__/     |_______||_______/ \n"
            "                                                           ");
+    printf("\n");
     econio_flush();
     econio_sleep(1);
     econio_textcolor(COL_RESET);

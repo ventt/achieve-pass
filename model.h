@@ -18,7 +18,7 @@ struct status_model {
  */
 struct main_screen_model_exam {
     char *course_name;
-    int courseNumber, credit, examNumber, elapsedHours;
+    int course_id, credit, examNumber, elapsedHours;
 };
 struct main_screen_model {
     int exams_size;
