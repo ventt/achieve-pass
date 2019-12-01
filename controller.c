@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 char *get_line_from_input() { //always free when made its purpose
     int buf_size = 32, index = 0;
@@ -46,6 +47,19 @@ int string_to_date_array(char *string, int which) {
     }
 }
 
+time_t toTime(struct Date date) {
+    time_t t;
+    struct tm *tm;
+
+    time(&t);
+    tm = localtime(&t);
+    tm->tm_year = date.year - 1900;
+    tm->tm_mon = date.month - 1;
+    tm->tm_mday = date.day;
+    time_t result = mktime(tm);
+    free(tm);
+    return result;
+}
 
 struct FileEntry *create_new_save() {
     econio_clrscr();
@@ -153,6 +167,7 @@ int absolved_practicing(struct FileEntry *fe) {
     }
     return result;
 }
+
 void main_screen(struct FileEntry *fileEntry, int showOnlyDone) {
     header();
     struct status_model statusModel;
@@ -187,6 +202,10 @@ void main_screen(struct FileEntry *fileEntry, int showOnlyDone) {
                     new_msm.exams[idx].examNumber = i + 1;
                     new_msm.exams[idx].credit = subject_it->data->credits;
                     new_msm.exams[idx].elapsedHours = subject_it->data->exams[i].hoursDone;
+
+                    time_t diff = toTime(subject_it->data->exams[i].date) - time(NULL);
+                    new_msm.exams[idx].hoursLeft = (int) (diff - (diff % 86400) * 12 * 3600) / 3600;
+
                     idx++;
                 }
             }

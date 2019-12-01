@@ -54,7 +54,7 @@ void main_screen_window(struct main_screen_model model) {
 
             econio_textcolor(COL_WHITE);
             printf("(%d) %s\n", exam->course_id, exam->course_name);
-            printf(" %d.exam\t %d hours left\n", exam->examNumber, 666);
+            printf(" %d.exam\t %d hours left\n", exam->examNumber, exam->hoursLeft);
             int allHour = exam->credit * 5;
             double percent = ((double) exam->elapsedHours / (double) allHour) * 100;
             printf(" %.0f%%\t%d/%d hours\n", percent, exam->elapsedHours, allHour);
