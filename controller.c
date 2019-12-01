@@ -5,7 +5,6 @@
 #include "econio.h"
 #include "data.h"
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -48,6 +47,7 @@ int string_to_date_array(char *string, int which) {
 }
 
 time_t toTime(struct Date date) {
+    // Forras: http://www.cplusplus.com/reference/ctime/mktime/
     time_t t;
     struct tm *tm;
 
@@ -56,6 +56,7 @@ time_t toTime(struct Date date) {
     tm->tm_year = date.year - 1900;
     tm->tm_mon = date.month - 1;
     tm->tm_mday = date.day;
+    // Visszaadja masodpercben az eltelt idot a megadott datumohoz kepest
     time_t result = mktime(tm);
     free(tm);
     return result;

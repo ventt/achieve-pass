@@ -4,7 +4,6 @@
 #include "data.h"
 #include "econio.h"
 #include "view.h"
-#include "model.h"
 #include "controller.h"
 
 enum menu {
@@ -21,6 +20,7 @@ enum exit_value {
 };
 
 int main() {
+    econio_clrscr();
     int menu_state = main_Screen;
     int exit = stay;
 
@@ -148,7 +148,7 @@ int main() {
                 } else if (strcmp(cmd_3, "/exit") == 0) {
                     menu_state = exit_app;
                 } else if (strcmp(cmd_3, "/delete") == 0) {
-                    fe->subjects_list = delete_subject(fe->subjects_list, subject->data->id);
+                    fe->subjects_list = subject_delete(fe->subjects_list, subject->data->id);
                     menu_state = main_Screen;
                 } else {
                     printf("\n Invalid command.");

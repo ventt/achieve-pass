@@ -4,7 +4,6 @@
 
 #include "view.h"
 #include "econio.h"
-#include "controller.h"
 #include <stdio.h>
 #include <string.h>
 
