@@ -40,7 +40,7 @@ int main() {
                 menu_state = main_Screen;
                 break;
             case main_Screen:
-                main_screen(fe);
+                main_screen(fe, 0);
                 printf("Parancs >");
                 menu_state = atoi(get_line_from_input());
                 break;
@@ -51,9 +51,8 @@ int main() {
                 menu_state = main_Screen;
                 break;
             case done_Subject:
-                printf("Hianyzo funkcio");
-                saved_window();
-                menu_state = main_Screen;
+                main_screen(fe, 1);
+                menu_state = atoi(get_line_from_input());
                 break;
             case check_Subject:
                 printf("Hianyzo funkcio");

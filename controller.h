@@ -15,7 +15,7 @@ struct FileEntry *create_new_save();
 
 void add_subject(struct FileEntry *fileEntry, int id);
 
-void main_screen(struct FileEntry *fileEntry);
+void main_screen(struct FileEntry *fileEntry, int showOnlyDone);
 
 struct SubjectList_node *subject_delete(struct SubjectList_node *list, int id);
 

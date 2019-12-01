@@ -126,7 +126,11 @@ void add_subject(struct FileEntry *fileEntry, int id) {
     }
 }
 
-void main_screen(struct FileEntry *fileEntry) {
+int is_exam_done(struct ExamEntry *examEntry, struct SubjectEntry *entry) {
+    return examEntry->hoursDone >= entry->credits * 5;
+}
+
+void main_screen(struct FileEntry *fileEntry, int showOnlyDone) {
     header();
     struct status_model statusModel;
     statusModel.achievement_points = fileEntry->achievement_points;
@@ -137,23 +141,32 @@ void main_screen(struct FileEntry *fileEntry) {
     struct main_screen_model new_msm;
     new_msm.exams_size = 0;
     if (fileEntry->subjects_size != 0) {
-        for (struct SubjectList_node *iterator = fileEntry->subjects_list;
-             iterator != NULL; iterator = iterator->nextNode) {
-            new_msm.exams_size += iterator->data->exams_size;
+        //ossze szamolja az examokat
+        for (struct SubjectList_node *subject_it = fileEntry->subjects_list;
+             subject_it != NULL; subject_it = subject_it->nextNode) {
+            for (int i = 0; i < subject_it->data->exams_size; i++) {
+                // xnor
+                if (showOnlyDone == is_exam_done(&subject_it->data->exams[i], subject_it->data)) {
+                    new_msm.exams_size++;
+                }
+            }
         }
         new_msm.exams = malloc(new_msm.exams_size * sizeof(struct main_screen_model_exam));
+
         int idx = 0;
-        for (struct SubjectList_node *iterator = fileEntry->subjects_list;
-             iterator != NULL; iterator = iterator->nextNode) {
-            int i;
-            for (i = 0; i < iterator->data->exams_size; ++i) {
-                new_msm.exams[i + idx].course_name = iterator->data->name;
-                new_msm.exams[i + idx].courseNumber = iterator->data->id;
-                new_msm.exams[i + idx].examNumber = i + 1;
-                new_msm.exams[i + idx].credit = iterator->data->credits;
-                new_msm.exams[i + idx].elapsedHours = iterator->data->exams[i].hoursDone;
+        for (struct SubjectList_node *subject_it = fileEntry->subjects_list;
+             subject_it != NULL; subject_it = subject_it->nextNode) {
+
+            for (int i = 0; i < subject_it->data->exams_size; i++) {
+                if (showOnlyDone == is_exam_done(&subject_it->data->exams[i], subject_it->data)) {
+                    new_msm.exams[idx].course_name = subject_it->data->name;
+                    new_msm.exams[idx].courseNumber = subject_it->data->id;
+                    new_msm.exams[idx].examNumber = i + 1;
+                    new_msm.exams[idx].credit = subject_it->data->credits;
+                    new_msm.exams[idx].elapsedHours = subject_it->data->exams[i].hoursDone;
+                    idx++;
+                }
             }
-            idx += idx + i + 1;
         }
     }
     main_screen_window(new_msm);
