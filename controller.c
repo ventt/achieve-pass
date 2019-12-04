@@ -58,7 +58,6 @@ time_t toTime(struct Date date) {
     tm->tm_mday = date.day;
     // Visszaadja masodpercben az eltelt idot a megadott datumohoz kepest
     time_t result = mktime(tm);
-    free(tm);
     return result;
 }
 

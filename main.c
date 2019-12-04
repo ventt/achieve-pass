@@ -5,6 +5,7 @@
 #include "econio.h"
 #include "view.h"
 #include "controller.h"
+#include "debugmalloc.h"
 
 enum menu {
     reg_Screen, // 0
@@ -29,7 +30,7 @@ int main() {
     if (!is_file_exists()) {
         menu_state = reg_Screen;
     } else {
-        fe = read();
+        fe = read_file();
     }
 
     while (exit) {
@@ -148,7 +149,7 @@ int main() {
                 } else if (strcmp(cmd_3, "/exit") == 0) {
                     menu_state = exit_app;
                 } else if (strcmp(cmd_3, "/delete") == 0) {
-                    fe->subjects_list = subject_delete(fe->subjects_list, subject->data->id);
+                    fe->subjects_list = delete_subject(fe->subjects_list, subject->data->id);
                     menu_state = main_Screen;
                 } else {
                     printf("\n Invalid command.");

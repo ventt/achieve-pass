@@ -70,6 +70,7 @@ void main_screen_window(struct main_screen_model model) {
         printf("\n");
     }
 
+    free(model.exams);
     econio_flush();
 }
 

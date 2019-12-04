@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "debugmalloc.h"
 
 struct Date {
     int year, month, day;
@@ -39,7 +40,7 @@ struct SubjectList_node {
 
 void save(struct FileEntry *fileEntry);
 
-struct FileEntry *read();
+struct FileEntry *read_file();
 
 void free_entry(struct FileEntry *fileEntry);
 

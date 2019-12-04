@@ -24,12 +24,15 @@ char *readLine(FILE *fp) {
     buf[i++] = '\0';
 
     char *result = calloc(i + 1, sizeof(char));
-    strlcpy(result, buf, i + 1);
+    strcpy(result, buf);
     return result;
 }
 
 int readLineInt(FILE *fp) {
-    return atoi(readLine(fp));
+    char *str = readLine(fp);
+    int i = atoi(str);
+    free(str);
+    return i;
 }
 
 struct Date readDate(FILE *fp) {
@@ -85,7 +88,7 @@ int is_file_exists() {
     return result;
 }
 
-struct FileEntry *read() {
+struct FileEntry *read_file() {
     FILE *fp;
     fp = fopen("save.txt", "r");
 
