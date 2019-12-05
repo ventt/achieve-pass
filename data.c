@@ -118,6 +118,7 @@ struct FileEntry *read_file() {
                 exam.hoursDone = readLineInt(fp);
                 new_subject->exams[exam_idx] = exam;
             }
+
             if (fileEntry->subjects_list->data == NULL) {
                 fileEntry->subjects_list->data = new_subject;
                 fileEntry->subjects_list->nextNode = NULL;
@@ -142,6 +143,7 @@ void free_subject_node(struct SubjectList_node *node) {
     free(node->data->name); //12. sor 1.
     free(node->data->description); //12. sor 2.
     free(node->data->exams); //99. sor
+    free(node->data);
     free(node); //111. sor
 }
 
