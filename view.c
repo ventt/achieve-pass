@@ -108,7 +108,7 @@ void subject_window_details(int edit_choice_to_show) {
             printf("(3) Describe = ");
             break;
         case 4:
-            printf("(4) Number of Exams = ");
+            printf("    Number of Exams = ");
             break;
         default:
             break;

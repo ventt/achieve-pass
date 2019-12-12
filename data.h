@@ -46,7 +46,7 @@ void free_entry(struct FileEntry *fileEntry);
 
 int is_file_exists();
 
-struct SubjectList_node *delete_subject(struct SubjectList_node *, int);
+struct SubjectList_node *delete_subject(struct FileEntry *, int);
 
 void add_exam(struct SubjectEntry *subjectEntry, struct Date date, int hoursDone);
 

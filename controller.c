@@ -271,11 +271,11 @@ struct SubjectList_node *check_subject_window(struct SubjectList_node *list, int
         printf("%d", subject->data->exams_size);
         for (int i = 0; i < subject->data->exams_size; ++i) {
             printf("\n");
-            add_subject_exam_date(i + 1);
+            add_subject_exam_date(i);
             printf("%d.%d.%d", subject->data->exams[i].date.year, subject->data->exams[i].date.month,
                    subject->data->exams[i].date.day);
             printf("\n");
-            add_subject_exam_hours_done(i + 1);
+            add_subject_exam_hours_done(i);
             printf("%d", subject->data->exams[i].hoursDone);
         }
         printf("\n");

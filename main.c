@@ -48,9 +48,32 @@ int main() {
                 char *cmd = strtok(input, " ");
 
                 if (strcmp(cmd, "/addtime") == 0) {
-                    subject_id = atoi(strtok(NULL, " "));
-                    int exam_id = atoi(strtok(NULL, " "));
-                    int time = atoi(strtok(NULL, " "));
+                    //Ellenorizzuk hogy a commandhoz jar-e id
+                    char *check_subject_id_valid = strtok(NULL, " ");
+                    if (check_subject_id_valid == NULL) {
+                        menu_state = main_Screen;
+                        econio_clrscr();
+                        free(input);
+                        break;
+                    }
+                    char *check_exam_id_valid = strtok(NULL, " ");
+                    if (check_exam_id_valid == NULL) {
+                        menu_state = main_Screen;
+                        econio_clrscr();
+                        free(input);
+                        break;
+                    }
+                    char *check_time_valid = strtok(NULL, " ");
+                    if (check_time_valid == NULL || atoi(check_time_valid) <= 0) {
+                        menu_state = main_Screen;
+                        econio_clrscr();
+                        free(input);
+                        break;
+                    }
+
+                    subject_id = atoi(check_subject_id_valid);
+                    int exam_id = atoi(check_exam_id_valid);
+                    int time = atoi(check_time_valid);
                     for (struct SubjectList_node *iterator = fe->subjects_list;
                          iterator != NULL; iterator = iterator->nextNode) {
                         if (iterator->data->id == subject_id) {
@@ -67,8 +90,29 @@ int main() {
                 } else if (strcmp(cmd, "/showdone") == 0) {
                     menu_state = done_Subject;
                 } else if (strcmp(cmd, "/checksubject") == 0) {
-                    subject_id = atoi(strtok(NULL, " "));
-                    menu_state = check_Subject;
+                    //Ellenorizzuk hogy a commandhoz jar-e id
+                    char *check_id_valid = strtok(NULL, " ");
+                    if (check_id_valid != NULL) {
+                        int id = atoi(check_id_valid);
+                        /*for(struct SubjectList_node *it = fe->subjects_list; it != NULL; it = it->nextNode) {
+                            if (id == it->data->id) {
+                                subject_id = id;
+                                menu_state = check_Subject;
+                                break;
+                            }
+                        }*/
+                        subject_id = id;
+                        menu_state = check_Subject;
+                        free(input);
+                        break;
+                    } else {
+                        menu_state = main_Screen;
+                        econio_clrscr();
+                        free(input);
+                        break;
+                    }
+
+
                 } else if (strcmp(cmd, "/exit") == 0) {
                     menu_state = exit_app;
                 } else {
@@ -90,8 +134,28 @@ int main() {
                 char *input_2 = get_line_from_input();
                 char *cmd_2 = strtok(input_2, " ");
                 if (strcmp(cmd_2, "/checksubject") == 0) {
-                    subject_id = atoi(strtok(NULL, " "));
-                    menu_state = check_Subject;
+                    //ellenorizzuk hogy jo-e az id
+                    char *check_id_valid = strtok(NULL, " ");
+                    if (check_id_valid != NULL) {
+                        int id = atoi(check_id_valid);
+                        /*for(struct SubjectList_node *it = fe->subjects_list; it != NULL; it = it->nextNode) {
+                            if (id == it->data->id) {
+                                subject_id = id;
+                                menu_state = check_Subject;
+                                break;
+                            }
+                        }*/
+                        subject_id = id;
+                        menu_state = check_Subject;
+                        free(input_2);
+                        break;
+                    } else {
+                        menu_state = done_Subject;
+                        econio_clrscr();
+                        free(input_2);
+                        break;
+                    }
+
                 } else if (strcmp(cmd_2, "/exit") == 0) {
                     menu_state = exit_app;
                 } else if (strcmp(cmd_2, "/mainmenu") == 0) {
@@ -127,14 +191,19 @@ int main() {
                 } else if (strcmp(cmd_3, "/editdata") == 0) {
                     int dataNumber = atoi(strtok(NULL, " "));
                     if (dataNumber == 1) {
+
                         char *new_name = strtok(NULL, " ");
-                        subject->data->name = realloc(subject->data->name, strlen(new_name) * sizeof(char) + 1);
+                        free(subject->data->name);
+                        subject->data->name = malloc(strlen(new_name) * sizeof(char) + 1);
                         strcpy(subject->data->name, new_name);
+
                     } else if (dataNumber == 2) {
                         subject->data->credits = atoi(strtok(NULL, " "));
                     } else if (dataNumber == 3) {
+
                         char *new_desc = strtok(NULL, " ");
-                        subject->data->description = realloc(subject->data->name, strlen(new_desc) * sizeof(char) + 1);
+                        free(subject->data->description);
+                        subject->data->description = malloc(strlen(new_desc) * sizeof(char) + 1);
                         strcpy(subject->data->description, new_desc);
                     }
                 } else if (strcmp(cmd_3, "/addexam") == 0) {
@@ -149,7 +218,7 @@ int main() {
                 } else if (strcmp(cmd_3, "/exit") == 0) {
                     menu_state = exit_app;
                 } else if (strcmp(cmd_3, "/delete") == 0) {
-                    fe->subjects_list = delete_subject(fe->subjects_list, subject->data->id);
+                    fe->subjects_list = delete_subject(fe, subject->data->id);
                     menu_state = main_Screen;
                 } else {
                     printf("\n Invalid command.");
@@ -162,6 +231,8 @@ int main() {
             case exit_app:
                 save(fe);
                 saved_window();
+                econio_textcolor(COL_BLUE);
+                printf("Tovabbi jo tanulast %s!\n", fe->user);
                 exit = turn_off;
                 break;
         }

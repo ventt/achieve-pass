@@ -97,6 +97,7 @@ struct FileEntry *read_file() {
     fileEntry->user = readLine(fp);
     fileEntry->achievement_points = readLineInt(fp);
     fileEntry->subjects_size = readLineInt(fp);
+    fileEntry->subjects_list = NULL;
 
     if (fileEntry->subjects_size) {
         fileEntry->subjects_list = malloc(sizeof(struct SubjectList_node));
@@ -147,12 +148,14 @@ void free_subject_node(struct SubjectList_node *node) {
     free(node); //111. sor
 }
 
-struct SubjectList_node *delete_subject(struct SubjectList_node *list, int id) {
+struct SubjectList_node *delete_subject(struct FileEntry *fileEntry, int id) {
     struct SubjectList_node *tmp;
+    struct SubjectList_node *list = fileEntry->subjects_list;
     if (list->data->id == id) {
         tmp = list;
         list = list->nextNode;
         free_subject_node(tmp);
+        fileEntry->subjects_size--;
         return list;
     }
 
@@ -163,18 +166,21 @@ struct SubjectList_node *delete_subject(struct SubjectList_node *list, int id) {
             tmp = iterator->nextNode;
             iterator->nextNode = tmp->nextNode;
             free_subject_node(tmp);
+            fileEntry->subjects_size--;
             return list;
         }
         if (iterator->nextNode->nextNode == NULL && iterator->nextNode->data->id == id) {
             tmp = iterator->nextNode;
             iterator->nextNode = NULL;
             free_subject_node(tmp);
+            fileEntry->subjects_size--;
             return list;
         }
     }
     return list;
 }
 
+//Hozzafuz egy uj examat a subjecthez
 void add_exam(struct SubjectEntry *subjectEntry, struct Date date, int hoursDone) {
     subjectEntry->exams = realloc(subjectEntry->exams, ++subjectEntry->exams_size * sizeof(struct ExamEntry));
 
