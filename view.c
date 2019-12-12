@@ -70,7 +70,9 @@ void main_screen_window(struct main_screen_model model) {
         printf("\n");
     }
 
-    free(model.exams);
+    if (model.exams_size > 0) {
+        free(model.exams);
+    }
     econio_flush();
 }
 
@@ -114,11 +116,11 @@ void subject_window_details(int edit_choice_to_show) {
 }
 
 void add_subject_exam_date(int exam_idx) {
-    printf("\t%d.Exam > Date of exam(YYYY.MM.DD) = ", exam_idx);
+    printf("\t%d.Exam > Date of exam(YYYY.MM.DD) = ", exam_idx + 1);
 }
 
 void add_subject_exam_hours_done(int exam_idx) {
-    printf("\t%d.Exam > Hours done = ", exam_idx);
+    printf("\t%d.Exam > Hours done = ", exam_idx + 1);
 }
 
 void saved_window() {

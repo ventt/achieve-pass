@@ -8,6 +8,10 @@
 #include <stdlib.h>
 #include <time.h>
 
+/**
+ * Beolvas egy karakterlancot az std inputrol
+ * @return karakterlancra mutato pointer
+ */
 char *get_line_from_input() { //always free when made its purpose
     int buf_size = 32, index = 0;
     char *line = calloc(buf_size, sizeof(char));
@@ -34,20 +38,26 @@ char *get_line_from_input() { //always free when made its purpose
     return line;
 }
 
+/**
+ * Visszaadja a datum egyes mezoit egy stringbol
+ * @param string datum string
+ * @param which 0: ev, 1:honap, 2:nap
+ * @return mezo erteke
+ */
 int string_to_date_array(char *string, int which) {
     int date[3];
     sscanf(string, "%d.%d.%d", &date[0], &date[1], &date[2]);
-    if (which == 0) {
-        return date[0];
-    } else if (which == 1) {
-        return date[1];
-    } else {
-        return date[2];
-    }
+    return date[which];
+
 }
 
+/**
+ * Megmondja hany masodperc van jelen es a megadott datum kozott
+ * Forras: http://www.cplusplus.com/reference/ctime/mktime/
+ * @param date datum
+ * @return
+ */
 time_t toTime(struct Date date) {
-    // Forras: http://www.cplusplus.com/reference/ctime/mktime/
     time_t t;
     struct tm *tm;
 
@@ -61,6 +71,10 @@ time_t toTime(struct Date date) {
     return result;
 }
 
+/**
+ * Egy uj mentest hoz letre
+ * @return FileEntry-re mutato pointer
+ */
 struct FileEntry *create_new_save() {
     econio_clrscr();
     reg_window();
@@ -71,10 +85,13 @@ struct FileEntry *create_new_save() {
     nf->subjects_size = 0;
     nf->subjects_list = NULL;
     save(nf);
-    free(name);
     return nf;
 }
 
+/**
+ * Targy hozzaadasa
+ * @param fileEntry
+ */
 void add_subject(struct FileEntry *fileEntry) {
     add_subject_window();
     //ID kiosztas
@@ -89,77 +106,88 @@ void add_subject(struct FileEntry *fileEntry) {
 
     struct SubjectEntry *subject = malloc(sizeof(struct SubjectEntry));
     struct SubjectList_node *new_node = malloc(sizeof(struct SubjectList_node));
-    {
-        subject->id = id;
-        subject->name = NULL;
-        subject->description = NULL;
-        subject->exams_size = 0;
-        subject->exams = NULL;
-    }
 
+    // Subject nullazasa
+    subject->id = id;
+    subject->name = NULL;
+    subject->description = NULL;
+    subject->exams_size = 0;
+    subject->exams = NULL;
+
+    // Nev beolvasas
     subject_window_details(1);
     subject->name = get_line_from_input();
 
-
+    // Kreditek beolvasasa
     subject_window_details(2);
     char *creditStr = get_line_from_input();
     subject->credits = atoi(creditStr);
     free(creditStr);
 
-
+    // Description beolvasasa
     subject_window_details(3);
     subject->description = get_line_from_input();
 
-
+    // Vizsgak szama
     subject_window_details(4);
     char *numberOEStr = get_line_from_input();
     subject->exams_size = atoi(numberOEStr);
     free(numberOEStr);
 
-    subject->exams = malloc(sizeof(struct ExamEntry) * subject->exams_size);
-
-    for (int i = 1; i <= subject->exams_size; ++i) {
-        subject->exams[i - 1].date.year = 0;
-        subject->exams[i - 1].date.month = 0;
-        subject->exams[i - 1].date.year = 0;
-
+    // Vizsgak hozzaadasa
+    subject->exams = calloc(subject->exams_size, sizeof(struct ExamEntry));
+    for (int i = 0; i < subject->exams_size; ++i) {
+        subject->exams[i].date.year = 0;
+        subject->exams[i].date.month = 0;
+        subject->exams[i].date.year = 0;
 
         add_subject_exam_date(i);
-        char *date = get_line_from_input();
-        subject->exams[i - 1].date.year = string_to_date_array(date, 0);
-        subject->exams[i - 1].date.month = string_to_date_array(date, 1);
-        subject->exams[i - 1].date.day = string_to_date_array(date, 2);
+        char *dateStr = get_line_from_input();
+        subject->exams[i].date.year = string_to_date_array(dateStr, 0);
+        subject->exams[i].date.month = string_to_date_array(dateStr, 1);
+        subject->exams[i].date.day = string_to_date_array(dateStr, 2);
+        free(dateStr);
 
         add_subject_exam_hours_done(i);
         char *hoursDoneStr = get_line_from_input();
-        subject->exams[i - 1].hoursDone = atoi(hoursDoneStr);
+        subject->exams[i].hoursDone = atoi(hoursDoneStr);
         free(hoursDoneStr);
-
-
     }
+
+    // Uj node a lancolt lista vegere adasa
     new_node->data = subject;
     new_node->nextNode = NULL;
+
     if (fileEntry->subjects_list == NULL) {
         fileEntry->subjects_list = new_node;
-        fileEntry->subjects_size++;
     } else {
         struct SubjectList_node *iterator;
         for (iterator = fileEntry->subjects_list; iterator->nextNode != NULL; iterator = iterator->nextNode);
         iterator->nextNode = new_node;
-        fileEntry->subjects_size++;
     }
+    fileEntry->subjects_size++;
 }
 
+/**
+ * Kesz van-e a vizsga?
+ * @param examEntry
+ * @param entry
+ * @return
+ */
 int is_exam_done(struct ExamEntry *examEntry, struct SubjectEntry *entry) {
     return examEntry->hoursDone >= entry->credits * 5;
 }
 
+/**
+ * Kiszamolja a pontot ha abszolvalva van
+ * @param fe
+ * @return
+ */
 int absolved_practicing(struct FileEntry *fe) {
     int result = 0;
     for (struct SubjectList_node *subject_it = fe->subjects_list;
          subject_it != NULL; subject_it = subject_it->nextNode) {
         for (int i = 0; i < subject_it->data->exams_size; i++) {
-            // xnor
             if (is_exam_done(&subject_it->data->exams[i], subject_it->data)) {
                 result++;
             }
@@ -168,6 +196,11 @@ int absolved_practicing(struct FileEntry *fe) {
     return result;
 }
 
+/**
+ * Fokepernyo
+ * @param fileEntry
+ * @param showOnlyDone csak a kesz vizsgakat mutassa
+ */
 void main_screen(struct FileEntry *fileEntry, int showOnlyDone) {
     header();
     struct status_model statusModel;
@@ -189,7 +222,8 @@ void main_screen(struct FileEntry *fileEntry, int showOnlyDone) {
                 }
             }
         }
-        new_msm.exams = malloc(new_msm.exams_size * sizeof(struct main_screen_model_exam));
+        
+        new_msm.exams = calloc(new_msm.exams_size, sizeof(struct main_screen_model_exam));
 
         int idx = 0;
         for (struct SubjectList_node *subject_it = fileEntry->subjects_list;
